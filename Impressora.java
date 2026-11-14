@@ -2,6 +2,7 @@ import java.util.Scanner;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.InputMismatchException;
 
 public class Impressora {
 
@@ -12,56 +13,79 @@ public class Impressora {
     static int parametro;
     static Scanner input = new Scanner(System.in);
 
+    static int lerInteiro(String mensagem) {
+        while (true) {
+            System.out.print(mensagem);
+
+            try {
+                int numero = input.nextInt();
+                input.nextLine();
+                return numero;
+
+            } catch (InputMismatchException e) {
+                System.out.println("Digite apenas numeros!");
+                input.nextLine();
+            }
+        }
+    }
+
     void configurarImpressora() {
 
-        System.out.println("Digite o tipo de conexão (1 = USB, 2 = Serial, 3 = Rede, 4 = Bluetooth): ");
-        tipo = input.nextInt();
-        input.nextLine();
+        tipo = lerInteiro("Digite o tipo de conexao (1 = USB, 2 = Serial, 3 = Rede, 4 = Bluetooth): ");
 
-        System.out.println("Digite o modelo da impressora  (i8 ou i9): ");
+        System.out.println("Digite o modelo da impressora (i8 ou i9): ");
         modelo = input.nextLine();
 
-        System.out.println("Digite a conexão (USB, COM2 ou IP): ");
+        System.out.println("Digite a conexao (USB, COM2 ou IP): ");
         conexao = input.nextLine();
 
-        System.out.println("Digite o parametro (0 para USB, Serial ou Rede): ");
-        parametro = input.nextInt();
+        parametro = lerInteiro("Digite o parametro (0 para USB, velocidade para Serial ou porta para Rede): ");
 
         System.out.println("Dados armazenados com sucesso!");
     }
 
     void abrirConexao() {
-        if (conexaoAberta == false) {
-            int ret = ImpressoraDLL.INSTANCE.AbreConexaoImpressora(tipo, modelo, conexao, parametro);
 
-            if (ret == 0) {
-                conexaoAberta = true;
-                System.out.println("Comunicou com sucesso!");
-            } else {
-                System.out.println("Erro ao abrir conexao. Retorno " + ret);
+        if (conexaoAberta == false) {
+
+            try {
+                int ret = ImpressoraDLL.INSTANCE.AbreConexaoImpressora(tipo, modelo, conexao, parametro);
+
+                if (ret == 0) {
+                    conexaoAberta = true;
+                    System.out.println("Comunicou com sucesso!");
+                } else {
+                    System.out.println("Erro ao abrir conexao. Retorno " + ret);
+                }
+
+            } catch (LinkageError e) {
+                System.out.println("Erro ao carregar a DLL da impressora: " + e.getMessage());
             }
+
         } else {
-            System.out.println("Já existe uma comunicação em aberto");
+            System.out.println("Ja existe uma comunicacao em aberto");
         }
     }
 
     void impressaoCodigoBarras() {
+
         if (conexaoAberta == true) {
 
             String dados = "{A012345678912";
 
-            int ret = ImpressoraDLL.INSTANCE.AbreConexaoImpressora(tipo, modelo, conexao, parametro);
+            int ret = ImpressoraDLL.INSTANCE.ImpressaoCodigoBarras(8, dados, 100, 2, 1);
+
             if (ret == 0) {
                 ImpressoraDLL.INSTANCE.Corte(3);
-                System.out.println("Comunicou com sucesso!");
+                System.out.println("Codigo de barras impresso!");
             } else {
-                System.out.println("Erro ao abrir conexao. Retorno " + ret);
+                System.out.println("Erro ao imprimir codigo de barras. Retorno " + ret);
             }
+
         } else {
-            System.out.println("Já existe uma comunicação em aberto");
+            System.out.println("Nao existe uma comunicacao em aberto.");
         }
     }
-
 
     void fecharConexao() {
 
@@ -88,9 +112,7 @@ public class Impressora {
             System.out.println("Digite o texto que deseja imprimir:");
             String dados = input.nextLine();
 
-            System.out.println("Quantidade de copias:");
-            int copias = input.nextInt();
-            input.nextLine();
+            int copias = lerInteiro("Quantidade de copias: ");
 
             if (copias <= 0) {
                 System.out.println("Precisa ser maior que zero!");
@@ -99,9 +121,7 @@ public class Impressora {
 
             for (int i = 1; i <= copias; i++) {
 
-                int ret = ImpressoraDLL.INSTANCE.ImpressaoTexto(
-                        dados, 0, 0, 0
-                );
+                int ret = ImpressoraDLL.INSTANCE.ImpressaoTexto(dados, 0, 0, 0);
 
                 if (ret >= 0) {
                     System.out.println("Texto enviado com sucesso! Copia " + i);
@@ -129,9 +149,7 @@ public class Impressora {
             System.out.println("Digite o conteudo do QR Code:");
             String dados = input.nextLine();
 
-            int ret = ImpressoraDLL.INSTANCE.ImpressaoQRCode(
-                    dados, 4, 2
-            );
+            int ret = ImpressoraDLL.INSTANCE.ImpressaoQRCode(dados, 4, 2);
 
             if (ret == 0) {
                 System.out.println("QR Code enviado para impressao!");
@@ -144,18 +162,23 @@ public class Impressora {
         }
     }
 
-    void imprimirXMLSAT() throws IOException {
+    void imprimirXMLSAT() {
 
         if (conexaoAberta == true) {
 
-            String dados = Files.readString(Paths.get("XMLSAT.xml"));
+            try {
+                String dados = Files.readString(Paths.get("XMLSAT.xml"));
 
-            int ret = ImpressoraDLL.INSTANCE.ImprimeXMLSAT(dados, 0);
+                int ret = ImpressoraDLL.INSTANCE.ImprimeXMLSAT(dados, 0);
 
-            if (ret == 0) {
-                System.out.println("XML SAT enviado para impressao!");
-            } else {
-                System.out.println("Erro ao imprimir XML SAT. Retorno: " + ret);
+                if (ret == 0) {
+                    System.out.println("XML SAT enviado para impressao!");
+                } else {
+                    System.out.println("Erro ao imprimir XML SAT. Retorno: " + ret);
+                }
+
+            } catch (IOException e) {
+                System.out.println("Erro ao encontrar ou ler o arquivo XML SAT.");
             }
 
         } else {
@@ -163,22 +186,25 @@ public class Impressora {
         }
     }
 
-    void imprimirXMLCancelamento() throws IOException {
+    void imprimirXMLCancelamento() {
 
         if (conexaoAberta == true) {
 
-            String dados = Files.readString(Paths.get("CANC_SAT.xml"));
+            try {
+                String dados = Files.readString(Paths.get("CANC_SAT.xml"));
 
-            String assinatura = "Q5DLkpdRijIRGY6YSSNsTWK1TztHL1vD0V1Jc4spo/CEUqICEb9SFy82ym8EhBRZjbh3btsZhF+sjHqEMR159i4agru9x6KsepK/q0E2e5xlU5cv3m1woYfgHyOkWDNcSdMsS6bBh2Bpq6s89yJ9Q6qh/J8YHi306ce9Tqb/drKvN2XdE5noRSS32TAWuaQEVd7u+TrvXlOQsE3fHR1D5f1saUwQLPSdIv01NF6Ny7jZwjCwv1uNDgGZONJdlTJ6p0ccqnZvuE70aHOI09elpjEO6Cd+orI7XHHrFCwhFhAcbalc+ZfO5b/+vkyAHS6CYVFCDtYR9Hi5qgdk31v23w==";
+                String assinatura = "Q5DLkpdRijIRGY6YSSNsTWK1TztHL1vD0V1Jc4spo/CEUqICEb9SFy82ym8EhBRZjbh3btsZhF+sjHqEMR159i4agru9x6KsepK/q0E2e5xlU5cv3m1woYfgHyOkWDNcSdMsS6bBh2Bpq6s89yJ9Q6qh/J8YHi306ce9Tqb/drKvN2XdE5noRSS32TAWuaQEVd7u+TrvXlOQsE3fHR1D5f1saUwQLPSdIv01NF6Ny7jZwjCwv1uNDgGZONJdlTJ6p0ccqnZvuE70aHOI09elpjEO6Cd+orI7XHHrFCwhFhAcbalc+ZfO5b/+vkyAHS6CYVFCDtYR9Hi5qgdk31v23w==";
 
-            int ret = ImpressoraDLL.INSTANCE.ImprimeXMLCancelamentoSAT(
-                    dados, assinatura, 0
-            );
+                int ret = ImpressoraDLL.INSTANCE.ImprimeXMLCancelamentoSAT(dados, assinatura, 0);
 
-            if (ret == 0) {
-                System.out.println("XML de cancelamento enviado para impressao!");
-            } else {
-                System.out.println("Erro ao imprimir XML de cancelamento. Retorno: " + ret);
+                if (ret == 0) {
+                    System.out.println("XML de cancelamento enviado para impressao!");
+                } else {
+                    System.out.println("Erro ao imprimir XML de cancelamento. Retorno: " + ret);
+                }
+
+            } catch (IOException e) {
+                System.out.println("Erro ao encontrar ou ler o arquivo XML de cancelamento.");
             }
 
         } else {
@@ -224,9 +250,7 @@ public class Impressora {
 
         if (conexaoAberta == true) {
 
-            System.out.println("Quantas linhas deseja avancar?");
-            int linhas = input.nextInt();
-            input.nextLine();
+            int linhas = lerInteiro("Quantas linhas deseja avancar? ");
 
             int ret = ImpressoraDLL.INSTANCE.AvancaPapel(linhas);
 
@@ -262,6 +286,7 @@ public class Impressora {
         }
     }
 }
+
 
 
 

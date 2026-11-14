@@ -27,9 +27,7 @@ public class Menu {
 
             menuImpresso();
 
-            System.out.println("Digite a opcao desejada: ");
-            int opc = Impressora.input.nextInt();
-            Impressora.input.nextLine();
+            int opc = Impressora.lerInteiro("Digite a opcao desejada: ");
 
             if (opc == 13) {
                 System.out.println("Saindo...");

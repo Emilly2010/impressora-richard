@@ -3,21 +3,16 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-
-        Scanner ler = new Scanner(System.in);
+        Scanner ler = Impressora.input;
 
         Usuario pessoa = new Usuario();
-
         boolean login = false;
 
         for (int tentativas = 3; tentativas > 0 && login == false; tentativas--) {
             System.out.print("Usuário: ");
             pessoa.usuario1 = ler.nextLine();
 
-            System.out.print("Senha: ");
-            pessoa.senha1 = ler.nextInt();
-
-            ler.nextLine();
+            pessoa.senha1 = Impressora.lerInteiro("Senha: ");
 
             login = pessoa.verificarLogin();
 
@@ -30,10 +25,8 @@ public class Main {
             System.out.println("Login feito com sucesso!");
             Menu menu = new Menu();
             menu.menuImpressora();
-
         } else {
             System.out.println("Tentativas esgotadas. Saindo...");
         }
-
     }
 }
