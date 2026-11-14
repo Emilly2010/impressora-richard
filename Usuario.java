@@ -1,4 +1,3 @@
-
 public class Usuario {
 
     String usuario1 = "";
