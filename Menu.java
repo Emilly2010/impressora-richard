@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 public class Menu {
     static Impressora impressora = new Impressora();
 
@@ -19,7 +21,7 @@ public class Menu {
         System.out.println("13 - Sair");
     }
 
-    static void menuImpressora() {
+    static void menuImpressora() throws IOException {
 
         while (true) {
 
