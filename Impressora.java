@@ -33,6 +33,11 @@ public class Impressora {
 
         tipo = lerInteiro("Digite o tipo de conexao (1 = USB, 2 = Serial, 3 = Rede, 4 = Bluetooth): ");
 
+        while (tipo < 1 || tipo > 4) {
+            System.out.println("Tipo de conexao invalido! Digite um numero de 1 a 4.");
+            tipo = lerInteiro("Digite novamente: ");
+        }
+
         System.out.println("Digite o modelo da impressora (i8 ou i9): ");
         modelo = input.nextLine();
 
@@ -43,7 +48,6 @@ public class Impressora {
 
         System.out.println("Dados armazenados com sucesso!");
     }
-
     void abrirConexao() {
 
         if (conexaoAberta == false) {
