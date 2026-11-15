@@ -7,6 +7,7 @@ import java.util.InputMismatchException;
 public class Impressora {
 
     static boolean conexaoAberta = false;
+    static boolean conexaoConfigurada = false;
     static int tipo;
     static String modelo;
     static String conexao;
@@ -46,9 +47,17 @@ public class Impressora {
 
         parametro = lerInteiro("Digite o parametro (0 para USB, velocidade para Serial ou porta para Rede): ");
 
+        conexaoConfigurada = true;
+
         System.out.println("Dados armazenados com sucesso!");
     }
+
     void abrirConexao() {
+
+        if (conexaoConfigurada == false) {
+            System.out.println("Configure a impressora antes de abrir a conexao!");
+            return;
+        }
 
         if (conexaoAberta == false) {
 
@@ -73,21 +82,28 @@ public class Impressora {
 
     void impressaoCodigoBarras() {
 
-        if (conexaoAberta == true) {
+        if (conexaoAberta == false) {
+            System.out.println("Conexao fechada. Abra a conexao antes.");
+            return;
+        }
+        
+        String dados = "{A012345678912";
 
-            String dados = "{A012345678912";
+        int ret = ImpressoraDLL.INSTANCE.ImpressaoCodigoBarras(8, dados, 100, 2, 1);
 
-            int ret = ImpressoraDLL.INSTANCE.ImpressaoCodigoBarras(8, dados, 100, 2, 1);
+        if (ret == 0) {
+            System.out.println("Codigo de barras impresso com sucesso!");
 
-            if (ret == 0) {
-                ImpressoraDLL.INSTANCE.Corte(3);
-                System.out.println("Codigo de barras impresso!");
+            int corte = ImpressoraDLL.INSTANCE.Corte(3);
+
+            if (corte == 0) {
+                System.out.println("Corte realizado com sucesso!");
             } else {
-                System.out.println("Erro ao imprimir codigo de barras. Retorno " + ret);
+                System.out.println("Erro ao realizar o corte. Retorno: " + corte);
             }
 
         } else {
-            System.out.println("Nao existe uma comunicacao em aberto.");
+            System.out.println("Erro ao imprimir codigo de barras. Retorno: " + ret);
         }
     }
 
@@ -290,6 +306,7 @@ public class Impressora {
         }
     }
 }
+
 
 
 
