@@ -18,7 +18,7 @@ public class Menu {
         System.out.println("10 - Sinal sonoro");
         System.out.println("11 - Avancar papel");
         System.out.println("12 - Status do papel");
-        System.out.println("13 - Sair");
+        System.out.println("0 - Sair");
     }
 
     static void menuImpressora() throws IOException {
@@ -29,7 +29,7 @@ public class Menu {
 
             int opc = Impressora.lerInteiro("Digite a opcao desejada: ");
 
-            if (opc == 13) {
+            if (opc == 0) {
                 System.out.println("Saindo...");
                 break;
             }

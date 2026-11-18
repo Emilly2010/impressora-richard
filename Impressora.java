@@ -162,6 +162,7 @@ public class Impressora {
         }
     }
 
+
     void impressaoQRCode() {
 
         if (conexaoAberta == true) {
@@ -173,6 +174,15 @@ public class Impressora {
 
             if (ret == 0) {
                 System.out.println("QR Code enviado para impressao!");
+
+                int corte = ImpressoraDLL.INSTANCE.Corte(3);
+
+                if (corte == 0) {
+                    System.out.println("Corte realizado com sucesso!");
+                } else {
+                    System.out.println("Erro ao realizar o corte. Retorno: " + corte);
+                }
+
             } else {
                 System.out.println("Erro ao imprimir QR Code. Retorno: " + ret);
             }
@@ -181,6 +191,8 @@ public class Impressora {
             System.out.println("Abra a conexao antes de imprimir.");
         }
     }
+
+
 
     void imprimirXMLSAT() {
 
@@ -193,6 +205,15 @@ public class Impressora {
 
                 if (ret == 0) {
                     System.out.println("XML SAT enviado para impressao!");
+
+                    int corte = ImpressoraDLL.INSTANCE.Corte(3);
+
+                    if (corte == 0) {
+                        System.out.println("Corte realizado com sucesso!");
+                    } else {
+                        System.out.println("Erro ao realizar o corte. Retorno: " + corte);
+                    }
+
                 } else {
                     System.out.println("Erro ao imprimir XML SAT. Retorno: " + ret);
                 }
@@ -205,6 +226,8 @@ public class Impressora {
             System.out.println("Abra a conexao antes de imprimir.");
         }
     }
+
+
 
     void imprimirXMLCancelamento() {
 
@@ -219,6 +242,15 @@ public class Impressora {
 
                 if (ret == 0) {
                     System.out.println("XML de cancelamento enviado para impressao!");
+
+                    int corte = ImpressoraDLL.INSTANCE.Corte(3);
+
+                    if (corte == 0) {
+                        System.out.println("Corte realizado com sucesso!");
+                    } else {
+                        System.out.println("Erro ao realizar o corte. Retorno: " + corte);
+                    }
+
                 } else {
                     System.out.println("Erro ao imprimir XML de cancelamento. Retorno: " + ret);
                 }
@@ -231,6 +263,7 @@ public class Impressora {
             System.out.println("Abra a conexao antes de imprimir.");
         }
     }
+
 
     void abrirGaveta() {
 
