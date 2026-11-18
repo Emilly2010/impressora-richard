@@ -15,18 +15,17 @@ public class Impressora {
     static Scanner input = new Scanner(System.in);
 
     static int lerInteiro(String mensagem) {
-        while (true) {
-            System.out.print(mensagem);
+        System.out.print(mensagem);
 
-            try {
-                int numero = input.nextInt();
-                input.nextLine();
-                return numero;
+        try {
+            int numero = input.nextInt();
+            input.nextLine();
+            return numero;
 
-            } catch (InputMismatchException e) {
-                System.out.println("Digite apenas numeros!");
-                input.nextLine();
-            }
+        } catch (InputMismatchException e) {
+            System.out.println("Digite apenas numeros!");
+            input.nextLine();
+            return -1;
         }
     }
 
